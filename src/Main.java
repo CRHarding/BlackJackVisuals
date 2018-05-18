@@ -11,7 +11,6 @@ public class Main extends PApplet {
     private PImage img;
     private String path;
     private String name;
-    private String[] filenames;
     private int state = 0;
 
     ControlP5 cp5;
@@ -33,9 +32,17 @@ public class Main extends PApplet {
 
     public void setup() {
         noLoop();
-        filenames = loadFilenames(path);
-        ArrayList<String> files = new ArrayList<String>(Arrays.asList(filenames));
-        System.out.println (files);
+        File dir = new File(path);
+        File[] fileList = dir.listFiles();
+
+        ArrayList<File> files = new ArrayList<>(Arrays.asList(fileList));
+        PImage[] images = new PImage[files.size()];
+
+        for (int i = 0; i < files.size(); i++) {
+            images[i] = loadImage(String.valueOf (files.get(i)));
+            System.out.println (images[i]);
+        }
+
 
         img = loadImage(path + "/cardTable.png");
         img.resize(width, height);
