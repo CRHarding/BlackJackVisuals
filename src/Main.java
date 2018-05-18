@@ -1,31 +1,26 @@
 import java.io.IOException;
 import processing.core.PApplet;
+import processing.core.PImage;
 
 public class Main extends PApplet {
-
+    private PImage img;
     public static void main(String[] args) {
         PApplet.main("Main", args);
         System.out.println("Welcome to Black Jack!");
-        Game game = new Game();
-        try {
-            game.run();
-        } catch (IOException e) {
-            e.printStackTrace ();
-        }
     }
 
     public void settings() {
-        size(640, 480);
+        fullScreen();
     }
 
     public void setup() {
-        background(102);
+        img = loadImage("/Users/caseyrharding/IdeaProjects/BlackJackVisuals/src/CardGameImages/cardTable.png");
+        img.resize(width, height);
+        Game game = new Game();
+        game.run();
     }
 
     public void draw() {
-        stroke(255);
-        if (mousePressed) {
-            line(mouseX, mouseY, pmouseX, pmouseY);
-        }
+        background(img);
     }
 }

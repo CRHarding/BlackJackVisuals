@@ -19,7 +19,7 @@ class Game {
 
     }
 
-    void run() throws IOException {
+    void run() {
         Scanner reader = new Scanner (System.in);
         System.out.println("What is your name?");
 
@@ -27,7 +27,12 @@ class Game {
         player.setName(name);
 
         FileManagement file = new FileManagement();
-        Properties saveFile = file.readFile ();
+        Properties saveFile = null;
+        try {
+            saveFile = file.readFile ();
+        } catch (IOException e) {
+            e.printStackTrace ();
+        }
         name = name.toLowerCase ();
         if (saveFile.containsKey(name)) {
             money = Integer.parseInt(saveFile.get(name).toString());
@@ -83,13 +88,15 @@ class Game {
 
         player.setName(player.getName().toLowerCase());
 
-        if (saveFile.containsKey (player.getName())) {
-            saveFile.remove (player.getName());
-        }
+        saveFile.remove (player.getName());
 
         saveFile.setProperty(player.getName(), Integer.toString(player.getMoney()));
 
-        file.writeFile();
+        try {
+            file.writeFile();
+        } catch (IOException e) {
+            e.printStackTrace ();
+        }
         reader.close();
     }
 
