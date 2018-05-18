@@ -1,8 +1,10 @@
+import processing.core.PApplet;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Scanner;
 
 class Game {
+    PApplet p;
     private User player;
     private User computer;
     private Deck d;
@@ -10,13 +12,13 @@ class Game {
     private int money;
     private int numberOfDecks;
 
-    Game() {
+    Game(String name, PApplet p) {
+        this.p = p;
         this.player = new User ("", 0);
         this.computer = new User ("Dealer", 0);
         playAgain = true;
         money = 0;
         numberOfDecks = 0;
-
     }
 
     void run() {
