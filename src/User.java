@@ -1,7 +1,12 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class User {
     private String name;
     private Hand hand;
     private int money;
+    private HashMap<String, String> state;
+    private ArrayList<Card> returnHand;
 
     public User(String name, int money) {
         this.name = name;
@@ -25,13 +30,24 @@ public class User {
 
     void addCard(Deck d) { hand.addCard(d.deal()); }
 
-    void setupBlackjack(Deck d) {
-        hand.addCard(d.deal());
-        hand.addCard(d.deal());
+    ArrayList<Card> setupBlackjack(Deck d) {
+        returnHand = new ArrayList<> ();
+        Card card1 = d.deal();
+        Card card2 = d.deal();
+        hand.addCard(card1);
+        hand.addCard(card2);
+        returnHand.add(card1);
+        returnHand.add(card2);
+        return returnHand;
+    }
+
+    ArrayList<Card> getHand() {
+        return returnHand;
     }
 
     void resetHand() {
         this.hand = new Hand();
+        this.returnHand = new ArrayList<>();
     }
 
     public String toString() {
