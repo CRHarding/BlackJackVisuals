@@ -5,39 +5,35 @@ import java.util.HashMap;
 import java.util.Properties;
 
 class Game {
-    PApplet p;
     private User player;
     private User computer;
     private Deck d;
     private Hit hit;
     private String name;
     private HashMap<String, String> state;
-    private ArrayList<Card> playerCards;
-    private ArrayList<Card> computerCards;
+    private ArrayList<Card> loadPlayerCards;
+    private ArrayList<Card> loadComputerCards;
     private String errors;
     private String messages;
     private int money;
     private int numberOfDecks;
 
-    Game(String name, PApplet p, HashMap<String, String> state) {
-        this.p = p;
+    Game(String name, HashMap<String, String> state) {
         this.player = new User ("", 0);
         this.computer = new User ("Dealer", 0);
-        playerCards = new ArrayList<>();
-        computerCards = new ArrayList<>();
+        loadPlayerCards = new ArrayList<>();
+        loadComputerCards = new ArrayList<>();
         money = 0;
         numberOfDecks = 2;
         this.name = name;
-        this.p = p;
         this.state = new HashMap<>();
         this.errors = "";
         this.messages = "";
         this.state = state;
         Deck d = new Deck(numberOfDecks);
-        playerCards = player.setupBlackjack(d);
-        computerCards = computer.setupBlackjack(d);
-        hit = new Hit(computer, player, d, playerCards, computerCards);
-
+        loadPlayerCards = player.setupBlackjack(d);
+        loadComputerCards = computer.setupBlackjack(d);
+        hit = new Hit(computer, player, d, loadPlayerCards, loadComputerCards);
     }
 
     HashMap<String, String> getState() {
@@ -57,17 +53,23 @@ class Game {
     }
 
     ArrayList<Card> getPlayerCards() {
-        System.out.println("get player cards" + playerCards.toString() + computerCards.toString());
-        return playerCards;
+        return this.player.getHand();
     }
 
     ArrayList<Card> getComputerCards() {
-        System.out.println("Get computer cards" + playerCards.toString() + computerCards.toString());
-        return computerCards;
+        return this.computer.getHand();
     }
 
     void setPlayerMoney(int money) {
         player.setMoney(player.getMoney() - money);
+    }
+
+    int getPlayerScore() {
+        return player.getTotal();
+    }
+
+    int getComputerScore() {
+        return computer.getTotal();
     }
 
     void getMoney() {
@@ -82,66 +84,52 @@ class Game {
         name = state.get("name");
         name = name.toLowerCase ();
 
-//        if (saveFile.containsKey(name)) {
-//            money = Integer.parseInt(saveFile.get(name).toString());
-//            state.put("founduser", "true");
-//            if (money <= 0) {
-//                state.put("Errors", "true");
-//                errors = "Golly, " + player.getName() + " looks like you're gonna have to change some money. How much would you like to add?";
-//            } else {
-//                errors = "";
-//                messages = "Welcome back, " + player.getName() + "! You currently have: $" + money;
-//            }
-//            errors = "";
-//        }
+        if (saveFile.containsKey(name)) {
+            money = Integer.parseInt(saveFile.get(name).toString());
+            state.put("founduser", "true");
+            if (money <= 0) {
+                state.put("Errors", "true");
+                errors = "Golly, " + player.getName() + " looks like you're gonna have to change some money. How much would you like to add?";
+            } else {
+                errors = "";
+                messages = "Welcome back, " + player.getName() + "! You currently have: $" + money;
+            }
+            errors = "";
+        }
     }
 
     void hit() {
-        playerCards = hit.playerHit();
+        loadPlayerCards = hit.playerHit();
     }
 
     void stay() {
-        computerCards = hit.computerHit();
+        loadComputerCards = hit.computerHit();
     }
 
     void run() {
         state.put("getmoney", "false");
         player.setMoney(money);
+    }
 
-//            Bet b = new Bet(reader, player);
-//            int playerBet = b.bet();
-//            boolean playerWin = hit.playerHit();
-//            printPlayer();
-//
-//            if (playerWin) {
-//                System.out.println("You won!! You have $" + player.getMoney() + " left.");
-//            } else {
-//                System.out.println("You lost. You have $" + player.getMoney() + " left");
-//            }
-//
-//            if (player.getMoney() == 0) {
-//                System.out.println ("Gosh, " + player.getName() + ", I guess you're gonna have to come back when you have more dough...");
-//            } else {
-//                System.out.println ("Well, " + player.getName () + ", would you like to play again? Yes or No");
-//                String wantToPlay = reader.next ().toLowerCase ();
-//                playAgain = wantToPlay.equals ("y") || wantToPlay.equals ("yes");
-//                if (playAgain) {
-//                    resetGame ();
-//                }
-//            }
-//        }
+    void save() {
+        FileManagement file = new FileManagement();
+        Properties saveFile = null;
+        try {
+            saveFile = file.readFile ();
+        } catch (IOException e) {
+            e.printStackTrace ();
+        }
 
-//        player.setName(player.getName().toLowerCase());
-//
-//        saveFile.remove (player.getName());
-//
-//        saveFile.setProperty(player.getName(), Integer.toString(player.getMoney()));
-//
-//        try {
-//            file.writeFile();
-//        } catch (IOException e) {
-//            e.printStackTrace ();
-//        }
-//        reader.close();
+        player.setName(player.getName().toLowerCase());
+
+        saveFile.remove (player.getName());
+
+        saveFile.setProperty(player.getName(), Integer.toString(player.getMoney()));
+
+        try {
+            file.writeFile();
+        } catch (IOException e) {
+            e.printStackTrace ();
+        }
     }
 }

@@ -18,32 +18,39 @@ public class Main extends PApplet {
     private PImage smallBet;
     private PImage mediumBet;
     private PImage largeBet;
-    private HashMap<String, PImage> images;
-    private String path;
-    private String name;
-    private Game game;
-    private HashMap<String, String> state;
-    private int count;
-    private String money;
 
+    private HashMap<String, String> state;
+    private HashMap<String, PImage> images;
     private ArrayList<Card> playerCards;
     private ArrayList<Card> computerCards;
+    private ArrayList<PImage> playerCardImages;
+    private ArrayList<PImage> computerCardImages;
 
-    private boolean loadCards;
+    private String path;
+    private String name;
+    private String money;
+    private String errorMessage;
+    private String looseMessage;
+    private String winMessage;
+
+    private int count;
+    private int playerScore;
+    private int computerScore;
+    private int playerBetAmount;
+
+    private boolean displayPlayerCards;
+    private boolean displayComputerCards;
     private boolean showComputerCards;
     private boolean bet;
     private boolean hitOrStay;
     private boolean errors;
-    private boolean displayCards;
-    private String errorMessage;
-    private int playerBetAmount;
-
-    private ArrayList<PImage> playerCardImages;
-    private ArrayList<PImage> computerCardImages;
+    private boolean gameLost;
+    private boolean gameWon;
 
     private ControlP5 cp5;
     private Textfield myTextfield;
     private Numberbox numbers;
+
     private Bang bang;
     private Bang hit;
     private Bang betButton;
@@ -51,26 +58,38 @@ public class Main extends PApplet {
 
     private PFont f;
 
+    private Game game;
+
     public Main() {
         name = "";
         path = "/Users/caseyrharding/IdeaProjects/BlackJackVisuals/src/CardGameImages";
+        errorMessage = "";
+        money = "0";
+        winMessage = "";
+        looseMessage = "";
+
+        images = new HashMap<>();
         state = new HashMap<>();
         state.put("screen", "welcome");
-        count = 0;
-        money = "0";
+
         playerCards = new ArrayList<>();
         computerCards = new ArrayList<>();
-        images = new HashMap<>();
-        loadCards = false;
         playerCardImages = new ArrayList<>();
         computerCardImages = new ArrayList<>();
+
         showComputerCards = false;
         bet = false;
         hitOrStay = false;
         errors = false;
-        displayCards = false;
-        errorMessage = "";
+        displayPlayerCards = false;
+        displayComputerCards = false;
+        gameLost = false;
+        gameWon = false;
+
+        count = 0;
         playerBetAmount = 0;
+        playerScore = 0;
+        computerScore = 0;
     }
 
     public static void main(String[] args) {
@@ -132,7 +151,7 @@ public class Main extends PApplet {
         ;
 
         myTextfield.keepFocus(true);
-        game = new Game(name, this, state);
+        game = new Game(name, state);
     }
 
     public void controlEvent(ControlEvent theEvent) {
@@ -189,14 +208,15 @@ public class Main extends PApplet {
 
     private void addPlayerMoney() {
         if (!errors  && Integer.parseInt(state.get("money")) > 0) {
-            loadCards = true;
             game.setState (state);
             numbers.remove ();
             bang.remove ();
             money = state.get ("money");
-            bet = true;
             game.run ();
             state.put ("screen", "run");
+            displayPlayerCards = true;
+            displayComputerCards = true;
+            bet = true;
         }
     }
 
@@ -216,17 +236,26 @@ public class Main extends PApplet {
 
         if (betMoney < currentMoney && betMoney > 0) {
             errors = false;
+            currentMoney = currentMoney - betMoney;
+            money = Integer.toString(currentMoney);
             game.setPlayerMoney (betMoney);
             playerBetAmount = betMoney;
         }
     }
 
     private void runHit() {
-        game.hit();
-        playerCards.clear();
-        playerCardImages.clear();
+        game.hit ();
+        playerScore = game.getPlayerScore();
+
+        playerCards.clear ();
+        playerCardImages.clear ();
         playerCards = game.getPlayerCards ();
-        loadCards = true;
+        displayPlayerCards = true;
+
+        if (playerScore > 21) {
+            gameLost = true;
+            looseMessage = "You busted, chump. You lost: $" + playerBetAmount;
+        }
     }
 
     private void runStay() {
@@ -235,7 +264,17 @@ public class Main extends PApplet {
         computerCardImages.clear();
         computerCards = game.getComputerCards ();
         showComputerCards = true;
-        loadCards = true;
+        displayComputerCards = true;
+        if (game.getPlayerScore() == 21 && !(game.getComputerScore() == 21)) {
+            gameWon = true;
+            money = Integer.toString(Integer.parseInt(money) + (playerBetAmount * 4));
+            winMessage = "Hmmmm...you got blackjack...that wasn't supposed to happen...\nGuards! Get this dealer outta here!\nAnyways, you won: $" + (playerBetAmount * 4);
+        }
+        if (game.getPlayerScore() > game.getComputerScore()) {
+            gameWon = true;
+            winMessage = "You're in the money! You won $" + playerBetAmount;
+            money = Integer.toString(Integer.parseInt(money) + (playerBetAmount * 2));
+        }
     }
 
     public void draw() {
@@ -268,12 +307,11 @@ public class Main extends PApplet {
                 int moneyAsInteger = Integer.parseInt(money);
                 text("$" + moneyAsInteger, 50, 550);
 
-                if (loadCards) {
-                    loadAllCards();
+                if (displayPlayerCards) {
+                    displayPlayerCards();
                 }
 
-                if (displayCards) {
-                    displayPlayerCards();
+                if (displayComputerCards) {
                     displayComputerCards();
                 }
 
@@ -284,10 +322,26 @@ public class Main extends PApplet {
                 if (hitOrStay) {
                     showHitOptions();
                 }
+
+                if (gameWon) {
+                    displayWin();
+                }
+
+                if (gameLost) {
+                    displayLose();
+                }
         }
         if (errors) {
             text(errorMessage, 350, 750);
         }
+    }
+
+    private void displayWin() {
+
+    }
+
+    private void displayLose() {
+        
     }
 
     private void userNotFound() {
@@ -328,7 +382,6 @@ public class Main extends PApplet {
                 .setPosition(550, 500)
                 .setSize(40, 40);
         hitOrStay = false;
-        loadCards = false;
     }
 
     private void showBetOptions() {
@@ -343,6 +396,7 @@ public class Main extends PApplet {
 
     private void displayComputerCards() {
         if (showComputerCards) {
+            computerCardImages = loadComputerCards();
             int placement = (width - (325)) / computerCardImages.size();
             for (int i = 0; i < computerCardImages.size (); i++) {
                 PImage img = computerCardImages.get(i);
@@ -362,6 +416,7 @@ public class Main extends PApplet {
     }
 
     private void displayPlayerCards() {
+        playerCardImages = loadPlayerCards();
         int placement = (width - (325)) / playerCardImages.size ();
         for (int i = 0; i < playerCardImages.size (); i++) {
             PImage img = playerCardImages.get (i);
@@ -371,27 +426,34 @@ public class Main extends PApplet {
         }
     }
 
-    private void loadAllCards() {
-        playerCards.clear();
-        computerCards.clear();
-        playerCardImages.clear();
-        computerCardImages.clear();
-        playerCards = game.getPlayerCards ();
+    private ArrayList<PImage> loadComputerCards() {
         computerCards = game.getComputerCards ();
-
-        String[] cardFileNames = changeCardToFilename (playerCards);
         String[] computerCardFileNames = changeCardToFilename (computerCards);
 
-        for (int i = 0; i < playerCards.size(); i++) {
-            playerCardImages.add (i, images.get(cardFileNames[i]));
-        }
-
         for (int i = 0; i < computerCards.size(); i++) {
-            computerCardImages.add (i, images.get(computerCardFileNames[i]));
+            if (computerCardImages.size() > i) {
+                computerCardImages.set (i, images.get (computerCardFileNames[i]));
+            } else {
+                computerCardImages.add( i, images.get (computerCardFileNames[i]));
+            }
         }
 
-        loadCards = false;
-        displayCards = true;
+        return computerCardImages;
+    }
+
+    private ArrayList<PImage> loadPlayerCards() {
+        playerCards = game.getPlayerCards ();
+        String[] cardFileNames = changeCardToFilename (playerCards);
+
+        for (int i = 0; i < playerCards.size (); i++) {
+            if (playerCardImages.size() > i) {
+                playerCardImages.set (i, images.get (cardFileNames[i]));
+            } else {
+                playerCardImages.add( i, images.get (cardFileNames[i]));
+            }
+        }
+
+        return playerCardImages;
     }
 
     private String[] changeCardToFilename(ArrayList<Card> hand) {

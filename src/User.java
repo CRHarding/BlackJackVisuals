@@ -44,8 +44,8 @@ public class User {
         return returnHand;
     }
 
-    Hand getHand() {
-        return hand;
+    ArrayList<Card> getHand() {
+        return returnHand;
     }
 
     void resetHand() {
