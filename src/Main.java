@@ -47,6 +47,7 @@ public class Main extends PApplet {
     private boolean gameLost;
     private boolean gameWon;
     private boolean displayEndMessage;
+    private boolean reset;
 
     private ControlP5 cp5;
     private Textfield myTextfield;
@@ -89,6 +90,7 @@ public class Main extends PApplet {
         gameLost = false;
         gameWon = false;
         displayEndMessage = false;
+        reset = false;
 
         count = 0;
         playerBetAmount = 0;
@@ -205,11 +207,13 @@ public class Main extends PApplet {
     }
 
     private void anotherRound() {
+        reset = true;
+        game.save(Integer.parseInt(money), name);
         resetBoard();
     }
 
     private void quitter() {
-        game.save(Integer.parseInt(money));
+        game.save(Integer.parseInt(money), name);
         emptyBoard();
     }
 
@@ -321,6 +325,7 @@ public class Main extends PApplet {
             case "empty":
                 break;
             case "main":
+                game.getMoney();
                 state = game.getState();
 
                 if (state.containsKey("founduser")) {
@@ -371,16 +376,19 @@ public class Main extends PApplet {
         hit.remove();
         stay.remove();
         text(winMessage, 100, 650);
-        resetGame();
+        resetGame ();
         displayEndMessage = false;
+        text("Would you like to play again?", 250, 600);
     }
 
     private void displayLose() {
         hit.remove();
         stay.remove();
         text(looseMessage, 400, 650);
-        resetGame();
+        resetGame ();
+
         displayEndMessage = false;
+        text("Would you like to play again?", 250, 600);
     }
 
     private void resetGame() {
@@ -390,9 +398,8 @@ public class Main extends PApplet {
             e.printStackTrace ();
         }
 
-        text("Would you like to play again?----------", width - 550, 700);
         playAgain = cp5.addBang("playagain")
-                .setPosition(width - 100, 500)
+                .setPosition(width - 200, 500)
                 .setSize(40, 40);
         quit = cp5.addBang("quit")
                 .setPosition(width-50, 500)
@@ -406,7 +413,14 @@ public class Main extends PApplet {
 
         images = new HashMap<>();
         state = new HashMap<>();
-        state.put("screen", "welcome");
+        state.put("screen", "run");
+        state.put("name", name);
+        state.put("money", money);
+        displayPlayerCards = true;
+        displayComputerCards = true;
+        bet = true;
+
+        game = new Game(name, state);
 
         playerCards = new ArrayList<>();
         computerCards = new ArrayList<>();
@@ -551,7 +565,6 @@ public class Main extends PApplet {
 
     private void addMoneyBox() {
         if (count < 1) {
-            game.getMoney();
             myTextfield.remove ();
             numbers = cp5.addNumberbox ("Money").setPosition (width/2-175, 50).setSize (350, 35);
             bang = cp5.addBang("addMoney")

@@ -111,7 +111,7 @@ class Game {
         player.setMoney(money);
     }
 
-    void save(int money) {
+    void save(int money, String name) {
         FileManagement file = new FileManagement();
         Properties saveFile = null;
         try {
@@ -120,7 +120,7 @@ class Game {
             e.printStackTrace ();
         }
 
-        player.setName(player.getName().toLowerCase());
+        player.setName(name.toLowerCase());
 
         saveFile.remove (player.getName());
 
