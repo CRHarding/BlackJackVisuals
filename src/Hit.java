@@ -7,10 +7,12 @@ class Hit {
     private ArrayList<Card> computerHand;
     private Deck d;
 
-    Hit(User computer, User player, Deck d, ArrayList<Card> playerHand, ArrayList<Card> ComputerHand) {
+    Hit(User computer, User player, Deck d, ArrayList<Card> playerHand, ArrayList<Card> computerHand) {
         this.computer = computer;
         this.player = player;
         this.d = d;
+        this.playerHand = playerHand;
+        this.computerHand = computerHand;
     }
 
     ArrayList<Card> computerHit() {

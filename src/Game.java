@@ -16,7 +16,6 @@ class Game {
     private ArrayList<Card> computerCards;
     private String errors;
     private String messages;
-    private boolean playAgain;
     private int money;
     private int numberOfDecks;
 
@@ -26,7 +25,6 @@ class Game {
         this.computer = new User ("Dealer", 0);
         playerCards = new ArrayList<>();
         computerCards = new ArrayList<>();
-        playAgain = true;
         money = 0;
         numberOfDecks = 2;
         this.name = name;
@@ -58,14 +56,14 @@ class Game {
         return messages;
     }
 
-    ArrayList<Card> getPlayerCards() { return playerCards; }
-
-    ArrayList<Card> getComputerCards() {
-        return computerCards;
+    ArrayList<Card> getPlayerCards() {
+        System.out.println("get player cards" + playerCards.toString() + computerCards.toString());
+        return playerCards;
     }
 
-    int playerMoney() {
-        return player.getMoney();
+    ArrayList<Card> getComputerCards() {
+        System.out.println("Get computer cards" + playerCards.toString() + computerCards.toString());
+        return computerCards;
     }
 
     void setPlayerMoney(int money) {
@@ -145,18 +143,5 @@ class Game {
 //            e.printStackTrace ();
 //        }
 //        reader.close();
-    }
-
-    private void printPlayer() {
-        System.out.println("Your hand:");
-        System.out.println(player.toString());
-    }
-
-    private void resetGame() {
-        player.resetHand();
-        computer.resetHand();
-        if (d.getSize() < 15) {
-            d = new Deck (numberOfDecks);
-        }
     }
 }
