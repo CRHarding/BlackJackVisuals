@@ -111,7 +111,7 @@ class Game {
         player.setMoney(money);
     }
 
-    void save() {
+    void save(int money) {
         FileManagement file = new FileManagement();
         Properties saveFile = null;
         try {
@@ -124,7 +124,7 @@ class Game {
 
         saveFile.remove (player.getName());
 
-        saveFile.setProperty(player.getName(), Integer.toString(player.getMoney()));
+        saveFile.setProperty(player.getName(), Integer.toString(money));
 
         try {
             file.writeFile();

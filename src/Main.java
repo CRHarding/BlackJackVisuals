@@ -46,6 +46,7 @@ public class Main extends PApplet {
     private boolean errors;
     private boolean gameLost;
     private boolean gameWon;
+    private boolean displayEndMessage;
 
     private ControlP5 cp5;
     private Textfield myTextfield;
@@ -55,6 +56,8 @@ public class Main extends PApplet {
     private Bang hit;
     private Bang betButton;
     private Bang stay;
+    private Bang playAgain;
+    private Bang quit;
 
     private PFont f;
 
@@ -85,6 +88,7 @@ public class Main extends PApplet {
         displayComputerCards = false;
         gameLost = false;
         gameWon = false;
+        displayEndMessage = false;
 
         count = 0;
         playerBetAmount = 0;
@@ -173,8 +177,12 @@ public class Main extends PApplet {
             }
 
             if (theEvent.getController ().getName ().equals("addBet")) {
+                int currentMoney = Integer.parseInt(money);
                 if (!errors && playerBetAmount > 0) {
                     hitOrStay = true;
+                    currentMoney = currentMoney - playerBetAmount;
+                    money = Integer.toString(currentMoney);
+                    game.setPlayerMoney (playerBetAmount);
                 }
             }
 
@@ -185,7 +193,24 @@ public class Main extends PApplet {
             if (theEvent.getController ().getName ().equals ("Stay")) {
                 runStay();
             }
+
+            if (theEvent.getController ().getName ().equals ("playagain")) {
+                anotherRound();
+            }
+
+            if (theEvent.getController ().getName ().equals ("quit")) {
+                quitter();
+            }
         }
+    }
+
+    private void anotherRound() {
+        resetBoard();
+    }
+
+    private void quitter() {
+        game.save(Integer.parseInt(money));
+        emptyBoard();
     }
 
     private void addName(ControlEvent theEvent) {
@@ -236,9 +261,6 @@ public class Main extends PApplet {
 
         if (betMoney < currentMoney && betMoney > 0) {
             errors = false;
-            currentMoney = currentMoney - betMoney;
-            money = Integer.toString(currentMoney);
-            game.setPlayerMoney (betMoney);
             playerBetAmount = betMoney;
         }
     }
@@ -254,6 +276,7 @@ public class Main extends PApplet {
 
         if (playerScore > 21) {
             gameLost = true;
+            displayEndMessage = true;
             looseMessage = "You busted, chump. You lost: $" + playerBetAmount;
         }
     }
@@ -267,13 +290,19 @@ public class Main extends PApplet {
         displayComputerCards = true;
         if (game.getPlayerScore() == 21 && !(game.getComputerScore() == 21)) {
             gameWon = true;
+            displayEndMessage = true;
             money = Integer.toString(Integer.parseInt(money) + (playerBetAmount * 4));
             winMessage = "Hmmmm...you got blackjack...that wasn't supposed to happen...\nGuards! Get this dealer outta here!\nAnyways, you won: $" + (playerBetAmount * 4);
         }
         if (game.getPlayerScore() > game.getComputerScore()) {
             gameWon = true;
+            displayEndMessage = true;
             winMessage = "You're in the money! You won $" + playerBetAmount;
             money = Integer.toString(Integer.parseInt(money) + (playerBetAmount * 2));
+        } else {
+            gameLost = true;
+            displayEndMessage = true;
+            looseMessage = "You lost, sucker.\nBetter luck next time, eh?";
         }
     }
 
@@ -289,6 +318,8 @@ public class Main extends PApplet {
         fill(255);
 
         switch(state.get("screen")) {
+            case "empty":
+                break;
             case "main":
                 state = game.getState();
 
@@ -323,11 +354,11 @@ public class Main extends PApplet {
                     showHitOptions();
                 }
 
-                if (gameWon) {
+                if (gameWon && displayEndMessage) {
                     displayWin();
                 }
 
-                if (gameLost) {
+                if (gameLost && displayEndMessage) {
                     displayLose();
                 }
         }
@@ -337,23 +368,73 @@ public class Main extends PApplet {
     }
 
     private void displayWin() {
-
+        hit.remove();
+        stay.remove();
+        text(winMessage, 100, 650);
+        resetGame();
+        displayEndMessage = false;
     }
 
     private void displayLose() {
-        
+        hit.remove();
+        stay.remove();
+        text(looseMessage, 400, 650);
+        resetGame();
+        displayEndMessage = false;
+    }
+
+    private void resetGame() {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace ();
+        }
+
+        text("Would you like to play again?----------", width - 550, 700);
+        playAgain = cp5.addBang("playagain")
+                .setPosition(width - 100, 500)
+                .setSize(40, 40);
+        quit = cp5.addBang("quit")
+                .setPosition(width-50, 500)
+                .setSize(40, 40);
+    }
+
+    private void resetBoard() {
+        errorMessage = "";
+        winMessage = "";
+        looseMessage = "";
+
+        images = new HashMap<>();
+        state = new HashMap<>();
+        state.put("screen", "welcome");
+
+        playerCards = new ArrayList<>();
+        computerCards = new ArrayList<>();
+        playerCardImages = new ArrayList<>();
+        computerCardImages = new ArrayList<>();
+
+        showComputerCards = false;
+        bet = false;
+        hitOrStay = false;
+        errors = false;
+        displayPlayerCards = false;
+        displayComputerCards = false;
+        gameLost = false;
+        gameWon = false;
+
+        count = 0;
+        playerBetAmount = 0;
+        playerScore = 0;
+        computerScore = 0;
+    }
+
+    private void emptyBoard() {
+        state.put("screen", "empty");
     }
 
     private void userNotFound() {
         state = game.getState ();
         addMoneyBox ();
-
-        if (state.containsKey("errors")) {
-            text(game.getErrors(), 50, 250);
-        }
-        if (state.containsKey("messages")) {
-            text(game.getMessages(), 150, 250);
-        }
     }
 
     private void foundTheUser() {
