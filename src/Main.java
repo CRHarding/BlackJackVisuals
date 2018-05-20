@@ -30,6 +30,10 @@ public class Main extends PApplet {
     private boolean loadCards;
     private boolean showComputerCards;
     private boolean bet;
+    private boolean hitOrStay;
+    private boolean errors;
+    private String errorMessage;
+    private int playerBetAmount;
 
     private ArrayList<PImage> playerCardImages;
     private ArrayList<PImage> computerCardImages;
@@ -58,6 +62,10 @@ public class Main extends PApplet {
         computerCardImages = new ArrayList<>();
         showComputerCards = false;
         bet = false;
+        hitOrStay = false;
+        errors = false;
+        errorMessage = "";
+        playerBetAmount = 0;
     }
 
     public static void main(String[] args) {
@@ -131,9 +139,49 @@ public class Main extends PApplet {
                 state.put("screen", "main");
                 game.setState(state);
             }
+
             if (theEvent.getController ().getName ().equals ("Money")) {
-                Integer storeMoney = (int) theEvent.getController().getValue();
-                state.put ("money", Integer.toString (storeMoney));
+                int playerMoney = (int) theEvent.getController ().getValue ();
+                if (playerMoney < 0) {
+                    errors = true;
+                    errorMessage = "Ya gotta have at least some money \n ya dingus...";
+                } else {
+                    state.put("money", Integer.toString (playerMoney));
+                    errors = false;
+                }
+            }
+
+            if (theEvent.getController ().getName ().equals ("BetAmount")) {
+                int currentMoney = Integer.parseInt(money);
+                int betMoney = (int) theEvent.getController ().getValue ();
+                System.out.println ("Here I've got money..." + currentMoney);
+                if (betMoney > currentMoney) {
+                    errors = true;
+                    errorMessage = "You don't have that kinda dough\n ya dingus...";
+                }
+
+                if (betMoney < 0) {
+                    errors = true;
+                    errorMessage = "Ya gotta bet more than 0 ya dingus...";
+                }
+
+                if (betMoney < currentMoney && betMoney > 0) {
+                    errors = false;
+                    game.setPlayerMoney (betMoney);
+                    playerBetAmount = betMoney;
+                }
+            }
+
+            if (theEvent.getController ().getName ().equals("addBet")) {
+                hitOrStay = true;
+            }
+
+            if (theEvent.getController ().getName ().equals ("Hit")) {
+
+            }
+
+            if (theEvent.getController ().getName ().equals ("Stay")) {
+
             }
         }
     }
@@ -172,10 +220,10 @@ public class Main extends PApplet {
                     addMoneyBox ();
 
                     if (state.containsKey("errors")) {
-                        text(game.getErrors(), 250, 250);
+                        text(game.getErrors(), 50, 250);
                     }
                     if (state.containsKey("messages")) {
-                        text(game.getMessages(), 450, 450);
+                        text(game.getMessages(), 150, 250);
                     }
                 }
                 break;
@@ -184,6 +232,7 @@ public class Main extends PApplet {
                 text("Welcome, ", width - (state.get("name").length() * 25), 450);
                 text(state.get("name"), width - (state.get("name").length() * 25), 500);
                 text("Current dough:", 125, 500);
+                System.out.println (money);
                 int moneyAsInteger = Integer.parseInt(money);
                 text("$" + moneyAsInteger, 50, 550);
 
@@ -205,7 +254,7 @@ public class Main extends PApplet {
                     for (int i = 0; i < playerCardImages.size (); i++) {
                         PImage img = playerCardImages.get (i);
                         img.resize (150, 250);
-                        image (img, placement, 700);
+                        image (img, placement, 750);
                         placement = placement + (i + 150);
                     }
                 }
@@ -228,23 +277,32 @@ public class Main extends PApplet {
                     }
                 }
 
-                if (!bet) {
+                if (bet) {
+                    numbers = cp5.addNumberbox ("BetAmount")
+                            .setPosition (500, 500)
+                            .setSize (60, 35);
+                    bang = cp5.addBang("addBet")
+                            .setPosition(550, 500)
+                            .setSize(40, 40);
+                    bet = false;
+                }
+
+                if (hitOrStay) {
+                    numbers.remove();
+                    bang.remove();
                     hit = cp5.addBang("Hit")
                             .setPosition(500, 500)
                             .setSize(40, 40);
                     stay = cp5.addBang("Stay")
                             .setPosition(550, 500)
                             .setSize(40, 40);
-                    bet = true;
-                }
-
-                if (state.containsKey("errors")) {
-                    text(game.getErrors(), 250, 250);
-                }
-                if (state.containsKey("messages")) {
-                    text(game.getMessages(), 450, 450);
+                    hitOrStay = false;
                 }
         }
+        if (errors) {
+            text(errorMessage, 350, 750);
+        }
+
         state = game.getState();
     }
 
@@ -254,6 +312,8 @@ public class Main extends PApplet {
         numbers.remove();
         bang.remove();
         money = state.get("money");
+        System.out.println (money);
+        bet = true;
         game.run();
         state.put ("screen", "run");
     }

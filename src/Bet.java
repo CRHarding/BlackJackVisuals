@@ -10,9 +10,6 @@ class Bet {
     }
 
     int bet() {
-        System.out.println(player.toString());
-        System.out.println("You have $" + player.getMoney() + "...");
-        System.out.println("How much would you like to bet, " + player.getName() + "?");
         int playerBet;
         do {
             playerBet = reader.nextInt();

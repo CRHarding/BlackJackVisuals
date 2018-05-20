@@ -60,6 +60,14 @@ class Game {
         return computerCards;
     }
 
+    int playerMoney() {
+        return player.getMoney();
+    }
+
+    void setPlayerMoney(int money) {
+        player.setMoney(player.getMoney() - money);
+    }
+
     void getMoney() {
         FileManagement file = new FileManagement();
         Properties saveFile = null;
@@ -73,9 +81,7 @@ class Game {
         name = name.toLowerCase ();
 
         if (saveFile.containsKey(name)) {
-            System.out.println (saveFile.get(name));
             money = Integer.parseInt(saveFile.get(name).toString());
-            System.out.println (money);
             state.put("founduser", "true");
             if (money <= 0) {
                 state.put("Errors", "true");
