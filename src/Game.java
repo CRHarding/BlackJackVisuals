@@ -9,6 +9,7 @@ class Game {
     private User player;
     private User computer;
     private Deck d;
+    private Hit hit;
     private String name;
     private HashMap<String, String> state;
     private ArrayList<Card> playerCards;
@@ -34,6 +35,11 @@ class Game {
         this.errors = "";
         this.messages = "";
         this.state = state;
+        Deck d = new Deck(numberOfDecks);
+        playerCards = player.setupBlackjack(d);
+        computerCards = computer.setupBlackjack(d);
+        hit = new Hit(computer, player, d, playerCards, computerCards);
+
     }
 
     HashMap<String, String> getState() {
@@ -52,9 +58,7 @@ class Game {
         return messages;
     }
 
-    ArrayList<Card> getPlayerCards() {
-        return playerCards;
-    }
+    ArrayList<Card> getPlayerCards() { return playerCards; }
 
     ArrayList<Card> getComputerCards() {
         return computerCards;
@@ -80,47 +84,34 @@ class Game {
         name = state.get("name");
         name = name.toLowerCase ();
 
-        if (saveFile.containsKey(name)) {
-            money = Integer.parseInt(saveFile.get(name).toString());
-            state.put("founduser", "true");
-            if (money <= 0) {
-                state.put("Errors", "true");
-                errors = "Golly, " + player.getName() + " looks like you're gonna have to change some money. How much would you like to add?";
+//        if (saveFile.containsKey(name)) {
+//            money = Integer.parseInt(saveFile.get(name).toString());
+//            state.put("founduser", "true");
+//            if (money <= 0) {
+//                state.put("Errors", "true");
+//                errors = "Golly, " + player.getName() + " looks like you're gonna have to change some money. How much would you like to add?";
+//            } else {
+//                errors = "";
+//                messages = "Welcome back, " + player.getName() + "! You currently have: $" + money;
+//            }
+//            errors = "";
+//        }
+    }
 
-                while (money <= 0) {
-                    errors = "You've gotta have some dough, buddy...";
-                }
+    void hit() {
+        playerCards = hit.playerHit();
+    }
 
-            } else {
-                errors = "";
-                messages = "Welcome back, " + player.getName() + "! You currently have: $" + money;
-            }
-            errors = "";
-        } else {
-            System.out.println ("Couldn't find user...");
-            messages = "Welcome " + player.getName() + ", how much money would you like to convert into chips?";
-            state.put("getmoney", "true");
-            state.put("founduser", "false");
-        }
-        if (state.containsKey("money")) {
-            while (Integer.parseInt(state.get("money")) <= 0) errors = "You've gotta have some dough, buddy...";
-        }
-
-        errors = "";
+    void stay() {
+        computerCards = hit.computerHit();
     }
 
     void run() {
-        d = new Deck(numberOfDecks);
         state.put("getmoney", "false");
         player.setMoney(money);
 
-//        while (player.getMoney() > 0 && playAgain) {
-            playerCards = player.setupBlackjack(d);
-            computerCards = computer.setupBlackjack(d);
-
 //            Bet b = new Bet(reader, player);
 //            int playerBet = b.bet();
-//            Hit hit = new Hit(computer, player, d, reader, playerBet);
 //            boolean playerWin = hit.playerHit();
 //            printPlayer();
 //

@@ -9,15 +9,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class Main extends PApplet {
-    PImage backgroundImage;
-    PImage betCircleImage;
-    PImage cornerImage;
-    PImage cornerImage2;
-    PImage cornerImage3;
-    PImage cornerImage4;
-    PImage smallBet;
-    PImage mediumBet;
-    PImage largeBet;
+    private PImage backgroundImage;
+    private PImage betCircleImage;
+    private PImage cornerImage;
+    private PImage cornerImage2;
+    private PImage cornerImage3;
+    private PImage cornerImage4;
+    private PImage smallBet;
+    private PImage mediumBet;
+    private PImage largeBet;
     private HashMap<String, PImage> images;
     private String path;
     private String name;
@@ -25,8 +25,10 @@ public class Main extends PApplet {
     private HashMap<String, String> state;
     private int count;
     private String money;
+
     private ArrayList<Card> playerCards;
     private ArrayList<Card> computerCards;
+
     private boolean loadCards;
     private boolean showComputerCards;
     private boolean bet;
@@ -43,6 +45,7 @@ public class Main extends PApplet {
     private Numberbox numbers;
     private Bang bang;
     private Bang hit;
+    private Bang betButton;
     private Bang stay;
 
     private PFont f;
@@ -81,7 +84,7 @@ public class Main extends PApplet {
         File dir = new File(path);
         File[] fileList = dir.listFiles();
 
-        ArrayList<File> files = new ArrayList<>(Arrays.asList(fileList));
+        ArrayList<File> files = new ArrayList<>(Arrays.asList(fileList != null ? fileList : new File[0]));
 
         for (File file : files) {
             images.put (String.valueOf (file), loadImage (path + "/" + file.getName ()));
@@ -142,7 +145,7 @@ public class Main extends PApplet {
 
             if (theEvent.getController ().getName ().equals ("Money")) {
                 int playerMoney = (int) theEvent.getController ().getValue ();
-                if (playerMoney < 0) {
+                if (playerMoney <= 0) {
                     errors = true;
                     errorMessage = "Ya gotta have at least some money \n ya dingus...";
                 } else {
@@ -151,16 +154,29 @@ public class Main extends PApplet {
                 }
             }
 
+            if (theEvent.getController ().getName ().equals ("addMoney")) {
+                if (!errors  && Integer.parseInt(state.get("money")) > 0) {
+                    loadCards = true;
+                    game.setState (state);
+                    numbers.remove ();
+                    bang.remove ();
+                    money = state.get ("money");
+                    bet = true;
+                    game.run ();
+                    state.put ("screen", "run");
+                }
+            }
+
             if (theEvent.getController ().getName ().equals ("BetAmount")) {
                 int currentMoney = Integer.parseInt(money);
                 int betMoney = (int) theEvent.getController ().getValue ();
-                System.out.println ("Here I've got money..." + currentMoney);
+
                 if (betMoney > currentMoney) {
                     errors = true;
                     errorMessage = "You don't have that kinda dough\n ya dingus...";
                 }
 
-                if (betMoney < 0) {
+                if (betMoney <= 0) {
                     errors = true;
                     errorMessage = "Ya gotta bet more than 0 ya dingus...";
                 }
@@ -173,15 +189,29 @@ public class Main extends PApplet {
             }
 
             if (theEvent.getController ().getName ().equals("addBet")) {
-                hitOrStay = true;
+                if (!errors && playerBetAmount > 0) {
+                    hitOrStay = true;
+                }
             }
 
             if (theEvent.getController ().getName ().equals ("Hit")) {
-
+                game.hit();
+                playerCards.clear();
+                playerCardImages.clear();
+                playerCards = game.getPlayerCards ();
+                loadCards = true;
             }
 
             if (theEvent.getController ().getName ().equals ("Stay")) {
-
+                game.stay();
+                computerCards.clear();
+                computerCardImages.clear();
+                computerCards = game.getComputerCards ();
+                playerCards.clear();
+                playerCardImages.clear();
+                playerCards = game.getPlayerCards ();
+                showComputerCards = true;
+                loadCards = true;
             }
         }
     }
@@ -232,24 +262,31 @@ public class Main extends PApplet {
                 text("Welcome, ", width - (state.get("name").length() * 25), 450);
                 text(state.get("name"), width - (state.get("name").length() * 25), 500);
                 text("Current dough:", 125, 500);
-                System.out.println (money);
+
                 int moneyAsInteger = Integer.parseInt(money);
                 text("$" + moneyAsInteger, 50, 550);
 
                 if (loadCards) {
                     playerCards = game.getPlayerCards ();
                     computerCards = game.getComputerCards();
+
                     String[] cardFileNames = changeCardToFilename (playerCards);
+                    String[] computerCardFileNames = changeCardToFilename (computerCards);
+
                     for (int i = 0; i < playerCards.size(); i++) {
                         playerCardImages.add (i, images.get(cardFileNames[i]));
                     }
+
                     for (int i = 0; i < computerCards.size(); i++) {
-                        computerCardImages.add (i, images.get(cardFileNames[i]));
+                        computerCardImages.add (i, images.get(computerCardFileNames[i]));
                     }
+
                     loadCards = false;
                 }
 
                 if (!loadCards) {
+                    playerCards = game.getPlayerCards ();
+                    computerCards = game.getComputerCards();
                     int placement = (width - (325)) / playerCardImages.size ();
                     for (int i = 0; i < playerCardImages.size (); i++) {
                         PImage img = playerCardImages.get (i);
@@ -281,7 +318,7 @@ public class Main extends PApplet {
                     numbers = cp5.addNumberbox ("BetAmount")
                             .setPosition (500, 500)
                             .setSize (60, 35);
-                    bang = cp5.addBang("addBet")
+                    betButton = cp5.addBang("addBet")
                             .setPosition(550, 500)
                             .setSize(40, 40);
                     bet = false;
@@ -289,7 +326,7 @@ public class Main extends PApplet {
 
                 if (hitOrStay) {
                     numbers.remove();
-                    bang.remove();
+                    betButton.remove();
                     hit = cp5.addBang("Hit")
                             .setPosition(500, 500)
                             .setSize(40, 40);
@@ -297,25 +334,12 @@ public class Main extends PApplet {
                             .setPosition(550, 500)
                             .setSize(40, 40);
                     hitOrStay = false;
+                    loadCards = false;
                 }
         }
         if (errors) {
             text(errorMessage, 350, 750);
         }
-
-        state = game.getState();
-    }
-
-    public void addMoney(ControlEvent theEvent) {
-        loadCards = true;
-        game.setState (state);
-        numbers.remove();
-        bang.remove();
-        money = state.get("money");
-        System.out.println (money);
-        bet = true;
-        game.run();
-        state.put ("screen", "run");
     }
 
     private String[] changeCardToFilename(ArrayList<Card> hand) {

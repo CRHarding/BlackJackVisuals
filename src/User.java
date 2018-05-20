@@ -28,7 +28,10 @@ public class User {
         this.money = this.money + amount;
     }
 
-    void addCard(Deck d) { hand.addCard(d.deal()); }
+    ArrayList<Card> addCard(Deck d) {
+        returnHand = hand.addCard(d.deal());
+        return returnHand;
+    }
 
     ArrayList<Card> setupBlackjack(Deck d) {
         returnHand = new ArrayList<> ();
@@ -41,8 +44,8 @@ public class User {
         return returnHand;
     }
 
-    ArrayList<Card> getHand() {
-        return returnHand;
+    Hand getHand() {
+        return hand;
     }
 
     void resetHand() {

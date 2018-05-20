@@ -4,9 +4,10 @@ class Hand {
     private ArrayList<Card> hand = new ArrayList<>();
     private int size = 0;
 
-    void addCard(Card newCard) {
+    ArrayList<Card> addCard(Card newCard) {
         this.hand.add(newCard);
         size = size + 1;
+        return this.hand;
     }
 
     int getTotal() {
