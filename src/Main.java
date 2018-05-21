@@ -74,8 +74,6 @@ public class Main extends PApplet {
         errorMessage = "";
 
         money = "0";
-        winMessage = "";
-        looseMessage = "";
 
         images = new HashMap<>();
         state = new HashMap<>();
@@ -249,11 +247,15 @@ public class Main extends PApplet {
     private void anotherRound() {
         saveMoney = state.get("money");
         game.save(Integer.parseInt(money), name);
+        winMessage = "";
+        looseMessage = "";
         resetBoard();
     }
 
     private void quitter() {
         game.save(Integer.parseInt(money), name);
+        winMessage = "";
+        looseMessage = "";
         emptyBoard();
     }
 
@@ -320,7 +322,6 @@ public class Main extends PApplet {
             gameLost = true;
             displayEndMessage = true;
             looseMessage = "You busted, chump. You lost: $" + playerBetAmount;
-            System.out.println (looseMessage);
         }
     }
 
@@ -422,14 +423,12 @@ public class Main extends PApplet {
 
     private void displayStatus() {
         if (winMessage != null) {
-            System.out.println (winMessage);
-            text(winMessage, width - 200, 350);
+            text(winMessage, width - 300, 350);
         } else {
-            System.out.println (looseMessage);
-            text (looseMessage, width - 200, 350);
+            text (looseMessage, width - 300, 350);
         }
 
-        text("Would you like to play again?", width - 400, 650);
+        text("Would you like to play again?", width - 300, 650);
     }
 
     private void displayWin() {
@@ -510,32 +509,32 @@ public class Main extends PApplet {
     private void displayComputerCards() {
         if (showComputerCards) {
             computerCardImages = loadComputerCards();
-            int placement = (width - (325)) / computerCardImages.size();
+            int placement = (width/2) - (150 * playerCardImages.size() / 2);
             for (int i = 0; i < computerCardImages.size (); i++) {
                 PImage img = computerCardImages.get(i);
                 img.resize(150, 250);
                 image (img, placement, 50);
-                placement = placement + (i + 150);
+                placement = placement + 150;
             }
         } else {
-            int placement = (width - (325)) / 2;
+            int placement = (width/2) - (150 * playerCardImages.size() / 2);
             for (int i = 0; i < 2; i++) {
                 PImage img = images.get (path + "/" + "red_back.png");
                 img.resize (150, 250);
                 image (img, placement, 50);
-                placement = placement + (i + 150);
+                placement = placement + 150;
             }
         }
     }
 
     private void displayPlayerCards() {
         playerCardImages = loadPlayerCards();
-        int placement = (width - (325)) / playerCardImages.size ();
+        int placement = (width/2) - (150 * playerCardImages.size() / 2);
         for (int i = 0; i < playerCardImages.size (); i++) {
             PImage img = playerCardImages.get (i);
             img.resize (150, 250);
             image (img, placement, 750);
-            placement = placement + (i + 150);
+            placement = placement + 150;
         }
     }
 
