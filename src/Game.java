@@ -21,6 +21,8 @@ class Game {
     Game(String name, HashMap<String, String> state) {
         this.player = new User ("", 0);
         this.computer = new User ("Dealer", 0);
+        player.resetHand();
+        computer.resetHand();
         loadPlayerCards = new ArrayList<>();
         loadComputerCards = new ArrayList<>();
         money = 0;
@@ -53,11 +55,12 @@ class Game {
     }
 
     ArrayList<Card> getPlayerCards() {
-        return this.player.getHand();
+        System.out.println ("In game line 58--->" + loadPlayerCards);
+        return loadPlayerCards;
     }
 
     ArrayList<Card> getComputerCards() {
-        return this.computer.getHand();
+        return loadComputerCards;
     }
 
     void setPlayerMoney(int money) {
@@ -82,6 +85,7 @@ class Game {
         }
 
         name = state.get("name");
+        player.setName(name);
         name = name.toLowerCase ();
 
         if (saveFile.containsKey(name)) {
@@ -90,26 +94,28 @@ class Game {
             if (money <= 0) {
                 state.put("Errors", "true");
                 errors = "Golly, " + player.getName() + " looks like you're gonna have to change some money. How much would you like to add?";
+                state.put("money", Integer.toString(0));
             } else {
                 errors = "";
                 messages = "Welcome back, " + player.getName() + "! You currently have: $" + money;
+                state.put("money", Integer.toString(money));
             }
-            errors = "";
         }
     }
 
     void hit() {
         loadPlayerCards = hit.playerHit();
+        System.out.println ("In game line 108--->" + loadPlayerCards);
     }
 
     void stay() {
         loadComputerCards = hit.computerHit();
     }
 
-    void run() {
-        state.put("getmoney", "false");
-        player.setMoney(money);
-    }
+//    void run() {
+//        state.put("getmoney", "false");
+//        player.setMoney(money);
+//    }
 
     void save(int money, String name) {
         FileManagement file = new FileManagement();

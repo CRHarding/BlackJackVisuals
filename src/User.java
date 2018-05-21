@@ -1,14 +1,12 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class User {
     private String name;
     private Hand hand;
     private int money;
-    private HashMap<String, String> state;
     private ArrayList<Card> returnHand;
 
-    public User(String name, int money) {
+    User(String name, int money) {
         this.name = name;
         this.money = money;
         hand = new Hand ();
@@ -49,27 +47,27 @@ public class User {
     }
 
     void resetHand() {
-        this.hand = new Hand();
-        this.returnHand = new ArrayList<>();
+        hand.reset();
+        returnHand = new ArrayList<>();
     }
 
     public String toString() {
         String returnString = "";
-        for (int i = 0; i < this.hand.getSize(); i++) {
-            if (i != this.hand.getSize() - 1) {
-                if (this.hand.getCard(i + 1).toString().contains("Ace")) {
-                    returnString = returnString + this.hand.getCard(i) + " and an ";
+        for (int i = 0; i < returnHand.size(); i++) {
+            if (i != returnHand.size() - 1) {
+                if (returnHand.get(i + 1).toString().contains("Ace")) {
+                    returnString = returnString + returnHand.get(i) + " and an ";
                 } else {
-                    returnString = returnString + this.hand.getCard(i) + " and a ";
+                    returnString = returnString + returnHand.get(i) + " and a ";
                 }
             } else {
-                returnString = returnString + this.hand.getCard(i);
+                returnString = returnString + returnHand.get(i);
             }
         }
         return returnString;
     }
 
     int getTotal() {
-        return this.hand.getTotal();
+        return hand.getTotal();
     }
 }

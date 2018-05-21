@@ -5,18 +5,23 @@ class Hand {
     private int size = 0;
 
     ArrayList<Card> addCard(Card newCard) {
-        this.hand.add(newCard);
+        hand.add(newCard);
         size = size + 1;
-        return this.hand;
+        return hand;
+    }
+
+    void reset() {
+        hand = new ArrayList<>();
+        size = 0;
     }
 
     int getTotal() {
         int handScore = 0;
-        if (this.size == 2 && (this.hand.get(0).getValue() == 1 && this.hand.get(1).getValue() > 10) || (this.hand.get(0).getValue() > 10) && this.hand.get(1).getValue() == 1) {
+        if (size == 2 && (hand.get(0).getValue() == 1 && hand.get(1).getValue() > 10) || (hand.get(0).getValue() > 10) && hand.get(1).getValue() == 1) {
             handScore = 50;
         } else {
-            for (int i = 0; i < this.size; i++) {
-                Card card = this.hand.get(i);
+            for (int i = 0; i < size; i++) {
+                Card card = hand.get(i);
                 if (card.getValue () == 1 && handScore + 11 < 21) {
                     handScore = handScore + 11;
                 } else {

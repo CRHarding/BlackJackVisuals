@@ -32,6 +32,7 @@ public class Main extends PApplet {
     private String errorMessage;
     private String looseMessage;
     private String winMessage;
+    private String saveMoney;
 
     private int count;
     private int playerScore;
@@ -65,9 +66,14 @@ public class Main extends PApplet {
     private Game game;
 
     public Main() {
+        initialState();
+    }
+
+    private void initialState() {
         name = "";
         path = "/Users/caseyrharding/IdeaProjects/BlackJackVisuals/src/CardGameImages";
         errorMessage = "";
+
         money = "0";
         winMessage = "";
         looseMessage = "";
@@ -106,7 +112,9 @@ public class Main extends PApplet {
         fullScreen();
     }
 
-    public void setup() {
+    private void createNewGame() {
+        initialState();
+
         File dir = new File(path);
         File[] fileList = dir.listFiles();
 
@@ -151,13 +159,47 @@ public class Main extends PApplet {
         cp5 = new ControlP5(this);
 
         myTextfield = cp5.addTextfield("Name")
-        .setPosition (width/2-175, 100)
-        .setSize(350, 35)
-        .setFocus(true)
+                .setPosition (width/2-175, 100)
+                .setSize(350, 35)
+                .setFocus(true)
         ;
 
         myTextfield.keepFocus(true);
         game = new Game(name, state);
+    }
+
+    private void resetBoard() {
+        createNewGame();
+
+        playAgain.remove();
+        quit.remove();
+
+        state.put("name", name);
+
+        if (saveMoney != null) {
+            state.put("money", saveMoney);
+        } else {
+            state.put("money", "0");
+        }
+
+        game.setState(state);
+
+        money = state.get ("money");
+
+        state.put ("screen", "run");
+        myTextfield.remove ();
+
+        displayPlayerCards = true;
+        displayComputerCards = true;
+        bet = true;
+    }
+
+    private void emptyBoard() {
+        state.put("screen", "empty");
+    }
+
+    public void setup() {
+        createNewGame();
     }
 
     public void controlEvent(ControlEvent theEvent) {
@@ -208,6 +250,7 @@ public class Main extends PApplet {
 
     private void anotherRound() {
         reset = true;
+        saveMoney = state.get("money");
         game.save(Integer.parseInt(money), name);
         resetBoard();
     }
@@ -241,7 +284,7 @@ public class Main extends PApplet {
             numbers.remove ();
             bang.remove ();
             money = state.get ("money");
-            game.run ();
+//            game.run ();
             state.put ("screen", "run");
             displayPlayerCards = true;
             displayComputerCards = true;
@@ -273,9 +316,7 @@ public class Main extends PApplet {
         game.hit ();
         playerScore = game.getPlayerScore();
 
-        playerCards.clear ();
         playerCardImages.clear ();
-        playerCards = game.getPlayerCards ();
         displayPlayerCards = true;
 
         if (playerScore > 21) {
@@ -406,54 +447,21 @@ public class Main extends PApplet {
                 .setSize(40, 40);
     }
 
-    private void resetBoard() {
-        errorMessage = "";
-        winMessage = "";
-        looseMessage = "";
-
-        images = new HashMap<>();
-        state = new HashMap<>();
-        state.put("screen", "run");
-        state.put("name", name);
-        state.put("money", money);
-        displayPlayerCards = true;
-        displayComputerCards = true;
-        bet = true;
-
-        game = new Game(name, state);
-
-        playerCards = new ArrayList<>();
-        computerCards = new ArrayList<>();
-        playerCardImages = new ArrayList<>();
-        computerCardImages = new ArrayList<>();
-
-        showComputerCards = false;
-        bet = false;
-        hitOrStay = false;
-        errors = false;
-        displayPlayerCards = false;
-        displayComputerCards = false;
-        gameLost = false;
-        gameWon = false;
-
-        count = 0;
-        playerBetAmount = 0;
-        playerScore = 0;
-        computerScore = 0;
-    }
-
-    private void emptyBoard() {
-        state.put("screen", "empty");
-    }
-
     private void userNotFound() {
         state = game.getState ();
         addMoneyBox ();
     }
 
     private void foundTheUser() {
+        state = game.getState();
         if (state.get("founduser").equals("true")) {
+            myTextfield.remove ();
             state.put ("screen", "run");
+            money = state.get ("money");
+//            game.run ();
+            displayPlayerCards = true;
+            displayComputerCards = true;
+            bet = true;
         } else {
             state = game.getState();
             addMoneyBox ();
@@ -538,6 +546,7 @@ public class Main extends PApplet {
 
     private ArrayList<PImage> loadPlayerCards() {
         playerCards = game.getPlayerCards ();
+
         String[] cardFileNames = changeCardToFilename (playerCards);
 
         for (int i = 0; i < playerCards.size (); i++) {

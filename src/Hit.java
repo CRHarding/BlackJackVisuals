@@ -27,31 +27,7 @@ class Hit {
     }
 
     ArrayList<Card> playerHit() {
-//        boolean playerWin;
         playerHand = player.addCard(d);
-        System.out.println (playerHand.toString());
         return playerHand;
-//        int playerTotal = player.getTotal();
-
-//        if (playerTotal > 21 && playerTotal != 50) {
-//            return false;
-//        }
-//
-//        playerWin = findWin();
-//        return playerWin;
-    }
-
-    private boolean findWin() {
-        if (player.getTotal() == 50) {
-            System.out.println ("YOU GOT BLACKJACK" + player.getName().toUpperCase() + "!!!");
-//            player.setMoney(playerBet * 4);
-            return true;
-        }else if (player.getTotal() > computer.getTotal()) {
-//            player.setMoney(playerBet * 2);
-            return true;
-        } else {
-//            player.setMoney(playerBet * -1);
-            return false;
-        }
     }
 }

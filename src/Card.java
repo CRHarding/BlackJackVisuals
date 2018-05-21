@@ -24,8 +24,6 @@ public class Card {
             case 3:
                 suit = "Spades";
                 break;
-            default:
-                System.out.println("Incorrect modulus for rank % 13 --> " + num % 4);
         }
     }
 
