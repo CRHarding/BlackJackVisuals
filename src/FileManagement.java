@@ -27,5 +27,6 @@ class FileManagement {
         FileOutputStream out = new FileOutputStream("save.ser");
 
         properties.store(out, "---Save File---");
+        out.close();
     }
 }

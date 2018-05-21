@@ -245,8 +245,6 @@ public class Main extends PApplet {
     }
 
     private void anotherRound() {
-        saveMoney = state.get("money");
-        game.save(Integer.parseInt(money), name);
         winMessage = "";
         looseMessage = "";
         resetBoard();
@@ -322,6 +320,7 @@ public class Main extends PApplet {
             gameLost = true;
             displayEndMessage = true;
             looseMessage = "You busted, chump. You lost: $" + playerBetAmount;
+            saveMoney = Integer.toString(Integer.parseInt(saveMoney) - playerBetAmount);
         }
     }
 
@@ -337,8 +336,8 @@ public class Main extends PApplet {
             gameWon = true;
             displayEndMessage = true;
             money = Integer.toString(Integer.parseInt(money) + (playerBetAmount * 4));
+            saveMoney = money;
             winMessage = "Hmmmm...you got blackjack...that wasn't supposed to happen...\nGuards! Get this dealer outta here!\nAnyways, you won: $" + (playerBetAmount * 4);
-            System.out.println (winMessage);
         }
 
         if (game.getPlayerScore() > game.getComputerScore()) {
@@ -347,11 +346,12 @@ public class Main extends PApplet {
             winMessage = "You're in the money! You won $" + playerBetAmount;
             System.out.println (winMessage);
             money = Integer.toString(Integer.parseInt(money) + (playerBetAmount * 2));
+            saveMoney = money;
         } else {
             gameLost = true;
             displayEndMessage = true;
             looseMessage = "You lost, sucker.\nBetter luck next time, eh?";
-            System.out.println (looseMessage);
+            saveMoney = Integer.toString(Integer.parseInt(saveMoney) - Integer.parseInt(money));
         }
     }
 
@@ -381,8 +381,8 @@ public class Main extends PApplet {
                 break;
             case "run":
                 state = game.getState();
-                text("Welcome, ", width - (state.get("name").length() * 25), 450);
-                text(state.get("name"), width - (state.get("name").length() * 25), 500);
+                text("Welcome, ", width - 150, 450);
+                text(state.get("name"), width - 150, 500);
                 text("Current dough:", 125, 500);
 
                 int moneyAsInteger = Integer.parseInt(money);
@@ -517,7 +517,7 @@ public class Main extends PApplet {
                 placement = placement + 150;
             }
         } else {
-            int placement = (width/2) - (150 * playerCardImages.size() / 2);
+            int placement = (width/2) - (150 / 2);
             for (int i = 0; i < 2; i++) {
                 PImage img = images.get (path + "/" + "red_back.png");
                 img.resize (150, 250);
