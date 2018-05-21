@@ -21,16 +21,20 @@ class Hand {
             handScore = 50;
         } else {
             for (int i = 0; i < size; i++) {
-                Card card = hand.get(i);
-                if (card.getValue () == 1 && handScore + 11 < 21) {
-                    handScore = handScore + 11;
-                } else {
-                    if (card.getValue() > 10)
-                        handScore = handScore + 10;
-                    else {
-                        handScore = handScore + card.getValue ();
+                Card card = hand.get (i);
+                if (card.getValue () == 1) {
+                    if (card.getValue () == 1 && handScore + 11 < 21) {
+                        handScore = handScore + 11;
+                    } else {
+                        if (card.getValue () > 10) handScore = handScore + 10;
+                        else {
+                            handScore = handScore + card.getValue ();
+                        }
                     }
                 }
+//            if (handScore > 21) {
+//                if (hand.contains());
+//            }
             }
         }
         return handScore;

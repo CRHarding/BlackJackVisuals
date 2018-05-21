@@ -36,7 +36,6 @@ public class Main extends PApplet {
 
     private int count;
     private int playerScore;
-    private int computerScore;
     private int playerBetAmount;
 
     private boolean displayPlayerCards;
@@ -48,7 +47,7 @@ public class Main extends PApplet {
     private boolean gameLost;
     private boolean gameWon;
     private boolean displayEndMessage;
-    private boolean reset;
+    private boolean displayGameStatusMessage;
 
     private ControlP5 cp5;
     private Textfield myTextfield;
@@ -96,12 +95,11 @@ public class Main extends PApplet {
         gameLost = false;
         gameWon = false;
         displayEndMessage = false;
-        reset = false;
+        displayGameStatusMessage = false;
 
         count = 0;
         playerBetAmount = 0;
         playerScore = 0;
-        computerScore = 0;
     }
 
     public static void main(String[] args) {
@@ -249,7 +247,6 @@ public class Main extends PApplet {
     }
 
     private void anotherRound() {
-        reset = true;
         saveMoney = state.get("money");
         game.save(Integer.parseInt(money), name);
         resetBoard();
@@ -323,6 +320,7 @@ public class Main extends PApplet {
             gameLost = true;
             displayEndMessage = true;
             looseMessage = "You busted, chump. You lost: $" + playerBetAmount;
+            System.out.println (looseMessage);
         }
     }
 
@@ -333,21 +331,26 @@ public class Main extends PApplet {
         computerCards = game.getComputerCards ();
         showComputerCards = true;
         displayComputerCards = true;
+
         if (game.getPlayerScore() == 21 && !(game.getComputerScore() == 21)) {
             gameWon = true;
             displayEndMessage = true;
             money = Integer.toString(Integer.parseInt(money) + (playerBetAmount * 4));
             winMessage = "Hmmmm...you got blackjack...that wasn't supposed to happen...\nGuards! Get this dealer outta here!\nAnyways, you won: $" + (playerBetAmount * 4);
+            System.out.println (winMessage);
         }
+
         if (game.getPlayerScore() > game.getComputerScore()) {
             gameWon = true;
             displayEndMessage = true;
             winMessage = "You're in the money! You won $" + playerBetAmount;
+            System.out.println (winMessage);
             money = Integer.toString(Integer.parseInt(money) + (playerBetAmount * 2));
         } else {
             gameLost = true;
             displayEndMessage = true;
             looseMessage = "You lost, sucker.\nBetter luck next time, eh?";
+            System.out.println (looseMessage);
         }
     }
 
@@ -407,29 +410,44 @@ public class Main extends PApplet {
                 if (gameLost && displayEndMessage) {
                     displayLose();
                 }
+
+                if (displayGameStatusMessage) {
+                    displayStatus();
+                }
         }
         if (errors) {
             text(errorMessage, 350, 750);
         }
     }
 
+    private void displayStatus() {
+        if (winMessage != null) {
+            System.out.println (winMessage);
+            text(winMessage, width - 200, 350);
+        } else {
+            System.out.println (looseMessage);
+            text (looseMessage, width - 200, 350);
+        }
+
+        text("Would you like to play again?", width - 400, 650);
+    }
+
     private void displayWin() {
         hit.remove();
         stay.remove();
-        text(winMessage, 100, 650);
         resetGame ();
+
+        displayGameStatusMessage = true;
         displayEndMessage = false;
-        text("Would you like to play again?", 250, 600);
     }
 
     private void displayLose() {
         hit.remove();
         stay.remove();
-        text(looseMessage, 400, 650);
         resetGame ();
 
+        displayGameStatusMessage = true;
         displayEndMessage = false;
-        text("Would you like to play again?", 250, 600);
     }
 
     private void resetGame() {
@@ -440,10 +458,10 @@ public class Main extends PApplet {
         }
 
         playAgain = cp5.addBang("playagain")
-                .setPosition(width - 200, 500)
+                .setPosition(width - 200, 700)
                 .setSize(40, 40);
         quit = cp5.addBang("quit")
-                .setPosition(width-50, 500)
+                .setPosition(width-150, 700)
                 .setSize(40, 40);
     }
 
@@ -465,13 +483,6 @@ public class Main extends PApplet {
         } else {
             state = game.getState();
             addMoneyBox ();
-
-            if (state.containsKey("errors")) {
-                text(game.getErrors(), 250, 250);
-            }
-            if (state.containsKey("messages")) {
-                text(game.getMessages(), 450, 450);
-            }
         }
     }
 
