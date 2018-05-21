@@ -55,7 +55,6 @@ class Game {
     }
 
     ArrayList<Card> getPlayerCards() {
-        System.out.println ("In game line 58--->" + loadPlayerCards);
         return loadPlayerCards;
     }
 
@@ -105,17 +104,11 @@ class Game {
 
     void hit() {
         loadPlayerCards = hit.playerHit();
-        System.out.println ("In game line 108--->" + loadPlayerCards);
     }
 
     void stay() {
         loadComputerCards = hit.computerHit();
     }
-
-//    void run() {
-//        state.put("getmoney", "false");
-//        player.setMoney(money);
-//    }
 
     void save(int money, String name) {
         FileManagement file = new FileManagement();

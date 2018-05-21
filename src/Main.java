@@ -476,7 +476,6 @@ public class Main extends PApplet {
             myTextfield.remove ();
             state.put ("screen", "run");
             money = state.get ("money");
-//            game.run ();
             displayPlayerCards = true;
             displayComputerCards = true;
             bet = true;
