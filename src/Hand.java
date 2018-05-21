@@ -16,25 +16,29 @@ class Hand {
     }
 
     int getTotal() {
+        int foundAce = 0;
         int handScore = 0;
         if (size == 2 && (hand.get(0).getValue() == 1 && hand.get(1).getValue() > 10) || (hand.get(0).getValue() > 10) && hand.get(1).getValue() == 1) {
             handScore = 50;
         } else {
             for (int i = 0; i < size; i++) {
                 Card card = hand.get (i);
-                if (card.getValue () == 1) {
-                    if (card.getValue () == 1 && handScore + 11 < 21) {
-                        handScore = handScore + 11;
-                    } else {
-                        if (card.getValue () > 10) handScore = handScore + 10;
-                        else {
-                            handScore = handScore + card.getValue ();
-                        }
+                if (card.getValue() == 1) {
+                    foundAce = foundAce = foundAce + 1;
+                }
+                if (card.getValue () == 1 && handScore + 11 < 21) {
+                    handScore = handScore + 11;
+                } else {
+                    if (card.getValue () > 10) handScore = handScore + 10;
+                    else {
+                        handScore = handScore + card.getValue ();
                     }
                 }
-//            if (handScore > 21) {
-//                if (hand.contains());
-//            }
+            }
+            if (foundAce > 0 && handScore > 21) {
+                for (int i = 0; i < foundAce; i++) {
+                    handScore = handScore - 10;
+                }
             }
         }
         return handScore;
